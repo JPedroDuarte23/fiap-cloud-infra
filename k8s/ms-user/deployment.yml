@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-user
+  labels:
+    app: ms-user
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-user
+  template:
+    metadata:
+      labels:
+        app: ms-user
+      annotations:              
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+
+    spec:
+      containers:
+      - name: ms-user
+        image: jpedroduarte123/fiap-srv-user:latest
+        ports:
+        - containerPort: 8080
+
+        envFrom:
+        - secretRef:
+            name: secrets-ms-user
+
+        livenessProbe:
+          httpGet:  
+            path: /health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 20
+
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+
+        resources: 
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "300m"
+            memory: "512Mi"

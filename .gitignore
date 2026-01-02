@@ -1,0 +1,4 @@
+*/secrets.yml
+*/.env
+*/.env.local
+*/.env.*.local
